@@ -181,7 +181,7 @@ document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;$
 document.addEventListener('submit',e=>{e.preventDefault();if(e.target.id!=='f')return;const i=$('#inp'),v=i.value.trim();if(!v){toast('Voice recording needs microphone permission and the backend');return}const n=new Date(),tm=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');S.cur.m.push(M('me',v,tm));S.cur.l=v;S.cur.t=tm;i.value='';$('#mb').innerHTML=ic('mic');msgs()});
 render();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1"></script>
 <script>
 (()=>{
 const C=window.MEHR_CONFIG,sb=window.SB=supabase.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true}});
@@ -281,7 +281,7 @@ await enter(r.data.user.id);P0={codes:g.c};S.fresh=1;go('codes')}
 async function log(){const u=val('un').trim(),p=val('pw'),n=SAL[u.toLowerCase()]||u.toLowerCase();er('form','');
 if(!u||!p){er('form',ta('bad'));return}
 const r=await sbc.auth.signInWithPassword({email:EM(n),password:p});
-if(r.error){if(/fetch|network/i.test(r.error.message))throw r.error;er('form',ta('bad'));return}
+if(r.error){console.error(r.error);er('form',/invalid login|invalid credentials/i.test(r.error.message)?ta('bad'):ta('err')+' ['+String(r.error.message).slice(0,80)+']');return}
 await enter(r.data.user.id);go('chats')}
 async function recv(){const u=val('un').trim(),n=u.toLowerCase(),c=val('rc').toUpperCase().replace(/[^A-Z0-9]/g,''),p=val('pw'),p2=val('pw2'),ep=vP(p,u),e2=p!==p2?ta('pMatch'):'';
 er('form','');er('pw',ep);er('pw2',e2);if(ep||e2)return;
@@ -302,7 +302,7 @@ const g=await mkc(),x=await sbc.rpc('set_recovery_codes',{p_hashes:g.h});if(x.er
 async function out(all){try{await sbc.auth.signOut({scope:all?'global':'local'})}catch{}window.Sync.stop();cu=null;go('login')}
 const H={register:reg,login:log,recovery:recv,setup:prof,chpw:chp,newcodes:gen};
 document.addEventListener('submit',async e=>{if(e.target.id!=='frm')return;const b=$('#sb'),l=b.textContent;b.disabled=true;b.textContent=ta('wait');
-try{await H[S.s]()}catch(x){toast(ta('err'))}
+try{await H[S.s]()}catch(x){console.error(x);toast(ta('err')+' ['+String((x&&(x.code||x.message))||x).slice(0,70)+']')}
 if(document.contains(b)){b.disabled=false;b.textContent=l}});
 document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el)return;const[x,y]=el.dataset.a.split(':');
 if(x==='show'){const i=$('#'+y);i.type=i.type==='password'?'text':'password'}
